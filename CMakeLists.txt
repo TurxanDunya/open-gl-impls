@@ -6,11 +6,13 @@ set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
 set(PROjECT_INCLUDE_DIR ${PROJECT_DIR}/include)
 set(PROjECT_SOURCE_DIR ${PROJECT_DIR}/src)
 set(PROJECT_SOURCES 
-            ${PROjECT_SOURCE_DIR}/main.cpp)
+            ${PROjECT_SOURCE_DIR}/main.cpp
+            ${PROjECT_SOURCE_DIR}/glad.c)
 # set(PROJECT_HEADERS
 #             ${PROjECT_SOURCE_DIR}/)
 
 find_package(glfw3 3.2 REQUIRED)
+find_package(glm REQUIRED)
 
 include_directories(${PROjECT_INCLUDE_DIR})
 

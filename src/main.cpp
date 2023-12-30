@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <glad/glad.h>
 #include <GlFW/glfw3.h>
 
 int main()
