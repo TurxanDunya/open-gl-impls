@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 
+#include <glm/vec3.hpp>
+
 class Program
 {
 public:
@@ -12,7 +14,8 @@ public:
     void link();
     void use();
     void addUniform(const std::string& uniformName);
-    void setValueToUniform(const std::string& uniformName, float value);
+    void setFloatValueToUniform(const std::string& uniformName, float value);
+    void setVec3ValueToUniform(const std::string& uniformName, glm::vec3 vec3);
 
 private:
     unsigned int m_ProgramId;

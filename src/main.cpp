@@ -2,13 +2,18 @@
 
 #include <glad/glad.h>
 #include <GlFW/glfw3.h>
+#include <glm/vec3.hpp>
 
 #include "shaderprogram/program.hpp"
 
 float vertices[] = {
-    -0.6f, -0.6f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+    -0.05f, -0.05f, 0.0f,
+     0.05f, -0.05f, 0.0f,
+     0.05f,  0.05f, 0.0f,
+
+    -0.05f,  0.05f, 0.0f,
+    -0.05f, -0.05f, 0.0f,
+     0.05f,  0.05f, 0.0f
 };
 
 void errorCallback(int error, const char* description) 
@@ -16,17 +21,23 @@ void errorCallback(int error, const char* description)
     std::cerr << "GLFW error (" << error << "): " << description << std::endl;
 }
 
-float moveX = 0.0f;
+glm::vec3 newPos = glm::vec3(0.0f, 0.0f, 0.0f);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
-    if (key == GLFW_KEY_ESCAPE)
+    if (key == GLFW_KEY_ESCAPE) 
         glfwTerminate();
 
-    if (key == GLFW_KEY_LEFT)
-        moveX -= 0.01f;
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
+        newPos -= glm::vec3(0.1f, 0.0f, 0.0f);
 
-    if (key == GLFW_KEY_RIGHT)
-        moveX += 0.01f;
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
+        newPos += glm::vec3(0.1f, 0.0f, 0.0f);
+
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS)
+        newPos += glm::vec3(0.0f, 0.1f, 0.1f);
+    
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
+        newPos -= glm::vec3(0.0f, 0.1f, 0.0f);
 }
 
 int main(int argc, char** argv)
@@ -69,7 +80,7 @@ int main(int argc, char** argv)
     program.link();
     // ------ CREATE SHADER PROGRAM END ------
 
-    program.addUniform("uMoveX");
+    program.addUniform("uMove");
 
     // ------ CREATE VERTEX BUFFER OBJECT ------
     unsigned int VBO;
@@ -96,12 +107,12 @@ int main(int argc, char** argv)
 
         program.use();
 
-        program.setValueToUniform("uMoveX", moveX);
+        program.setVec3ValueToUniform("uMove", newPos);
 
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

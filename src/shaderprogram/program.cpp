@@ -43,9 +43,14 @@ void Program::addUniform(const std::string& uniformName)
     m_UniformVars[uniformName] = glGetUniformLocation(m_ProgramId, uniformName.c_str());
 }
 
-void Program::setValueToUniform(const std::string& uniformName, float value)
+void Program::setFloatValueToUniform(const std::string& uniformName, float value)
 {
     glUniform1f(m_UniformVars[uniformName], value);
+}
+
+void Program::setVec3ValueToUniform(const std::string& uniformName, glm::vec3 vec3)
+{
+    glUniform3f(m_UniformVars[uniformName], vec3.x, vec3.y, vec3.z);
 }
 
 std::string Program::GetShaderFromFile(const char* fileName)
