@@ -3,7 +3,23 @@
 #include <glad/glad.h>
 #include <GlFW/glfw3.h>
 
-#include "shaderprogram/program.hpp"
+// vertex shader
+char* vssource = 
+"#version 330 core\n                          \
+layout (location = 0) in vec3 inPosition;     \
+void main()                                   \
+{                                             \
+    gl_Position = vec4(inPosition, 1.0f);     \
+}";
+
+// fragment shader
+char* fssource =
+"#version 330 core\n                          \
+out vec4 fragColor;                           \
+void main()                                   \
+{                                             \
+    fragColor = vec4(1.0f, 0.0f, 0.0f, 1.0f); \
+}";
 
 float vertices[] = {
     -0.6f, -0.6f, 0.0f,
@@ -47,10 +63,21 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    Program program;
-    program.attachShader("../shaders/vertexshader.glsl", GL_VERTEX_SHADER);
-    program.attachShader("../shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
-    program.link();
+    // ------ CREATE PROGRAM ------
+    unsigned int programId = glCreateProgram();
+
+    unsigned int vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShaderId, 1, &vssource, NULL);
+    glCompileShader(vertexShaderId);
+    glAttachShader(programId, vertexShaderId);
+
+    unsigned int fragmentShaderId = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShaderId, 1, &fssource, NULL);
+    glCompileShader(fragmentShaderId);
+    glAttachShader(programId, fragmentShaderId);
+
+    glLinkProgram(programId);
+    // ------ CREATE PROGRAM END ------
 
     // ------ CREATE VERTEX BUFFER OBJECT ------
     unsigned int VBO;
@@ -75,7 +102,7 @@ int main(int argc, char** argv)
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        program.use();
+        glUseProgram(programId);
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 
