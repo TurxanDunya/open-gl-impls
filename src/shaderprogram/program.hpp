@@ -4,6 +4,7 @@
 #include <map>
 
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 class Program
 {
@@ -16,6 +17,7 @@ public:
     void addUniform(const std::string& uniformName);
     void setFloatValueToUniform(const std::string& uniformName, float value);
     void setVec3ValueToUniform(const std::string& uniformName, glm::vec3 vec3);
+    void setVec4ValueToUniform(const std::string& uniformName, glm::vec4 vec4);
 
 private:
     unsigned int m_ProgramId;

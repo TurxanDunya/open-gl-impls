@@ -5,6 +5,9 @@
 #include <glm/vec3.hpp>
 
 #include "shaderprogram/program.hpp"
+#include "shapes/square.hpp"
+
+Square square(0.0f, 0.0f, 0.1f);
 
 float vertices[] = {
     -0.05f, -0.05f, 0.0f,
@@ -28,16 +31,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwTerminate();
 
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-        newPos -= glm::vec3(0.1f, 0.0f, 0.0f);
+        square.setDirection(Square::LEFT);
 
     if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        newPos += glm::vec3(0.1f, 0.0f, 0.0f);
+        square.setDirection(Square::RIGHT);
 
     if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-        newPos += glm::vec3(0.0f, 0.1f, 0.1f);
+        square.setDirection(Square::UP);
     
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-        newPos -= glm::vec3(0.0f, 0.1f, 0.0f);
+        square.setDirection(Square::DOWN);
 }
 
 int main(int argc, char** argv)
@@ -107,11 +110,13 @@ int main(int argc, char** argv)
 
         program.use();
 
-        program.setVec3ValueToUniform("uMove", newPos);
+        program.setVec3ValueToUniform("uMove", square.getPosition());
+        program.setVec4ValueToUniform("uColor", square.getColor());
 
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 
+        square.move();
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
