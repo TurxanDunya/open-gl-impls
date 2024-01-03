@@ -11,8 +11,22 @@ float vertices[] = {
      0.0f,  0.5f, 0.0f
 };
 
-void errorCallback(int error, const char* description) {
+void errorCallback(int error, const char* description) 
+{
     std::cerr << "GLFW error (" << error << "): " << description << std::endl;
+}
+
+float moveX = 0.0f;
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+{
+    if (key == GLFW_KEY_ESCAPE)
+        glfwTerminate();
+
+    if (key == GLFW_KEY_LEFT)
+        moveX -= 0.01f;
+
+    if (key == GLFW_KEY_RIGHT)
+        moveX += 0.01f;
 }
 
 int main(int argc, char** argv)
@@ -39,6 +53,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    glfwSetKeyCallback(window, key_callback);
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -47,10 +62,14 @@ int main(int argc, char** argv)
         return -1;
     }
 
+    // ------ CREATE SHADER PROGRAM ------
     Program program;
     program.attachShader("../shaders/vertexshader.glsl", GL_VERTEX_SHADER);
     program.attachShader("../shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
     program.link();
+    // ------ CREATE SHADER PROGRAM END ------
+
+    program.addUniform("uMoveX");
 
     // ------ CREATE VERTEX BUFFER OBJECT ------
     unsigned int VBO;
@@ -76,6 +95,9 @@ int main(int argc, char** argv)
         glClear(GL_COLOR_BUFFER_BIT);
 
         program.use();
+
+        program.setValueToUniform("uMoveX", moveX);
+
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 

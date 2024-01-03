@@ -38,6 +38,16 @@ void Program::use()
     glUseProgram(m_ProgramId);
 }
 
+void Program::addUniform(const std::string& uniformName)
+{
+    m_UniformVars[uniformName] = glGetUniformLocation(m_ProgramId, uniformName.c_str());
+}
+
+void Program::setValueToUniform(const std::string& uniformName, float value)
+{
+    glUniform1f(m_UniformVars[uniformName], value);
+}
+
 std::string Program::GetShaderFromFile(const char* fileName)
 {
     std::ifstream file(fileName);
