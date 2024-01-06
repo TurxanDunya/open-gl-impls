@@ -21,6 +21,7 @@ public:
 
     void move();
     void setDirection(Square::DIRECTION direction);
+    DIRECTION getDirection() const;
 
 private:
     glm::vec4 m_Color;

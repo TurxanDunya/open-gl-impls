@@ -3,13 +3,15 @@
 #include <cstdlib>
 
 Square::Square(float x, float y, float length)
+    : m_Length(length)
 {
     m_Position = glm::vec3(x, y, 0.0f);
-    m_Length = 0.01f;
+    m_Direction = Square::RIGHT;
 
     m_Color.r = (10 + std::rand() % 15) / 25.0;
     m_Color.g = (10 + std::rand() % 15) / 25.0;
     m_Color.b = (10 + std::rand() % 15) / 25.0;
+    m_Color.a = 1.0f;
 }
 
 glm::vec3 Square::getPosition() 
@@ -47,4 +49,9 @@ void Square::move()
 void Square::setDirection(Square::DIRECTION direction)
 {
     m_Direction = direction;
+}
+
+Square::DIRECTION Square::getDirection() const
+{
+    return m_Direction;
 }
