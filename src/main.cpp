@@ -12,6 +12,7 @@
 #include "shapes/square.hpp"
 
 std::vector<glm::vec3> vertices;
+std::vector<unsigned int> indices;
 
 void createCircle(float radius, int vertexCount)
 {
@@ -27,14 +28,14 @@ void createCircle(float radius, int vertexCount)
         float y = radius * sin(glm::radians(newAngle));
         float z = 0.0f;
 
-        tempVertices.push_back(glm::vec3(x, y, z));
+        vertices.push_back(glm::vec3(x, y, z));
     }
 
     for (int i = 0; i < triangleCount; i++)
     {
-        vertices.push_back(tempVertices[0]);
-        vertices.push_back(tempVertices[i + 1]);
-        vertices.push_back(tempVertices[i + 2]);
+        indices.push_back(0);
+        indices.push_back(i + 1);
+        indices.push_back(i + 2);
     }
 }
 
@@ -120,6 +121,13 @@ int main(int argc, char** argv)
     glBindVertexArray(VAO);
     // ------ CREATE VERTEX BUFFER OBJECT END ------
 
+    // ------ CREATE INDEX BUFFER OBJECT ------
+    unsigned int IBO;
+    glGenBuffers(1, &IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
+    // ------ CREATE INDEX BUFFER OBJECT END ------
+
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
     glEnableVertexAttribArray(0);
@@ -135,8 +143,9 @@ int main(int argc, char** argv)
         glEnableVertexAttribArray(0);
 
         program.setVec3ValueToUniform("uMove", glm::vec3(0.0f, 0.0f, 0.0f));
-        program.setVec4ValueToUniform("uColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
+        program.setVec4ValueToUniform("uColor", glm::vec4(1.0f, 0.5f, 0.8f, 1.0f));
+        // glDrawArray is using vertex buffer directly
+        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
         std::this_thread::sleep_for (std::chrono::milliseconds(100));
 
