@@ -6,26 +6,37 @@
 #include <glad/glad.h>
 #include <GlFW/glfw3.h>
 #include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
 
-void addToSnakeTail();
-void drawSnake(Program&);
-void moveSnake();
+std::vector<glm::vec3> vertices;
 
-std::vector<Square*> snakeParts;
+void createCircle(float radius, int vertexCount)
+{
+    float angle = 360.0f / vertexCount;
+    int triangleCount = vertexCount - 2;
 
-float length = 0.1f;
-float vertices[] = {
-    -length / 2, -length / 2, 0.0f,
-     length / 2, -length / 2, 0.0f,
-     length / 2,  length / 2, 0.0f,
+    std::vector<glm::vec3> tempVertices;
+    for (int i = 0; i < vertexCount; i++)
+    {
+        float newAngle = angle * i;
 
-    -length / 2,  length / 2, 0.0f,
-    -length / 2, -length / 2, 0.0f,
-     length / 2,  length / 2, 0.0f
-};
+        float x = radius * cos(glm::radians(newAngle));
+        float y = radius * sin(glm::radians(newAngle));
+        float z = 0.0f;
+
+        tempVertices.push_back(glm::vec3(x, y, z));
+    }
+
+    for (int i = 0; i < triangleCount; i++)
+    {
+        vertices.push_back(tempVertices[0]);
+        vertices.push_back(tempVertices[i + 1]);
+        vertices.push_back(tempVertices[i + 2]);
+    }
+}
 
 void errorCallback(int error, const char* description) 
 {
@@ -37,12 +48,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE) 
         glfwTerminate();
 
-    if (key == GLFW_KEY_SPACE)
-    {
-        addToSnakeTail();
-    }
-    
-    Square* firstPart = snakeParts[0];
+    Square* firstPart = new Square(0.0f, 0.0f, 1.0f);
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
         firstPart -> setDirection(Square::LEFT);
 
@@ -71,7 +77,7 @@ int main(int argc, char** argv)
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // For Mac only
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Hello OPENGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 800, "Hello OPENGL", NULL, NULL);
 
     if (window == NULL)
     {
@@ -89,10 +95,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    for (int i = 0; i < 4; i++)
-    {
-        addToSnakeTail();
-    }
+    createCircle(1, 12);
     
     // ------ CREATE SHADER PROGRAM ------
     Program program;
@@ -108,7 +111,7 @@ int main(int argc, char** argv)
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
     // ------ CREATE VERTEX BUFFER OBJECT END ------
 
     // ------ CREATE VERTEX ARRAY OBJECT ------
@@ -131,8 +134,9 @@ int main(int argc, char** argv)
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 
-        drawSnake(program);
-        moveSnake();
+        program.setVec3ValueToUniform("uMove", glm::vec3(0.0f, 0.0f, 0.0f));
+        program.setVec4ValueToUniform("uColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+        glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 
         std::this_thread::sleep_for (std::chrono::milliseconds(100));
 
@@ -140,66 +144,4 @@ int main(int argc, char** argv)
         glfwPollEvents();
     }
         
-}
-
-void drawSnake(Program& program)
-{
-    for (auto snakePart: snakeParts)
-    {
-        program.setVec3ValueToUniform("uMove", snakePart -> getPosition());
-        program.setVec4ValueToUniform("uColor", snakePart -> getColor());
-        glDrawArrays(GL_TRIANGLES, 0, 6);
-    }
-}
-
-void addToSnakeTail() 
-{
-    int elementCount = snakeParts.size();
-    if (elementCount == 0)
-    {
-        snakeParts.push_back(new Square(0.0f, 0.0f, length));
-    }
-    else
-    {
-        Square* lastSquare = snakeParts[elementCount - 1];
-
-        glm::vec3 position = lastSquare -> getPosition();
-        Square::DIRECTION direction = lastSquare -> getDirection();
-
-        switch (direction)
-        {
-            case Square::LEFT:
-                position -= glm::vec3(length, 0.0f, 0.0f);
-                break;
-
-            case Square::RIGHT:
-                position += glm::vec3(length, 0.0f, 0.0f);
-                break;
-            
-            case Square::UP:
-                position += glm::vec3(0.0f, length, 0.0f);
-                break;
-
-            case Square::DOWN:
-                position -= glm::vec3(0.0f, length, 0.0f);
-                break;
-        }
-
-        Square* newSquare = new Square(position.x, position.y, length);
-        newSquare -> setDirection(direction);
-        snakeParts.push_back(newSquare);
-    }
-}
-
-void moveSnake()
-{
-    for (auto snakePart: snakeParts)
-    {
-        snakePart -> move();
-    }
-
-    for(int i = snakeParts.size() - 1; i > 0; i--)
-    {
-        snakeParts[i] -> setDirection(snakeParts[i - 1] -> getDirection());
-    }
 }
