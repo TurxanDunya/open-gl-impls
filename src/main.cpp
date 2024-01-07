@@ -5,8 +5,11 @@
 
 #include <glad/glad.h>
 #include <GlFW/glfw3.h>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtx/matrix_transform_2d.hpp>
 
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
@@ -105,8 +108,8 @@ int main(int argc, char** argv)
     program.link();
     // ------ CREATE SHADER PROGRAM END ------
 
-    program.addUniform("uMove");
     program.addUniform("uColor");
+    program.addUniform("uMtxTransform");
 
     // ------ CREATE VERTEX BUFFER OBJECT ------
     unsigned int VBO;
@@ -133,17 +136,22 @@ int main(int argc, char** argv)
     glEnableVertexAttribArray(0);
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
 
+    float rotationAngle = 0.0f;
+    glm::mat3 mtxTransform(1);
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        mtxTransform = glm::rotate(mtxTransform, glm::radians(rotationAngle));
+        rotationAngle += 0.1f;
+
         program.use();
         glBindVertexArray(VAO);
         glEnableVertexAttribArray(0);
 
-        program.setVec3ValueToUniform("uMove", glm::vec3(0.0f, 0.0f, 0.0f));
-        program.setVec4ValueToUniform("uColor", glm::vec4(1.0f, 0.5f, 0.8f, 1.0f));
+        program.setVec4ValueToUniform("uColor", glm::vec4(0.4f, 0.8f, 0.5f, 1.0f));
+        program.setMat3ValueToUniform("uMtxTransform", &mtxTransform);
         // glDrawArray is using vertex buffer directly
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 

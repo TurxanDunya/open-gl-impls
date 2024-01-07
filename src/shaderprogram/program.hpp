@@ -5,6 +5,7 @@
 
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
+#include <glm/mat3x3.hpp>
 
 class Program
 {
@@ -18,6 +19,7 @@ public:
     void setFloatValueToUniform(const std::string& uniformName, float value);
     void setVec3ValueToUniform(const std::string& uniformName, glm::vec3 vec3);
     void setVec4ValueToUniform(const std::string& uniformName, glm::vec4 vec4);
+    void setMat3ValueToUniform(const std::string& uniformName, glm::mat3* mat3);
 
 private:
     unsigned int m_ProgramId;

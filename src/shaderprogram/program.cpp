@@ -58,6 +58,11 @@ void Program::setVec4ValueToUniform(const std::string& uniformName, glm::vec4 ve
     glUniform4f(m_UniformVars[uniformName], vec4.r, vec4.g, vec4.b, vec4.a);
 }
 
+void Program::setMat3ValueToUniform(const std::string& uniformName, glm::mat3* mat3)
+{
+    glUniformMatrix3fv(m_UniformVars[uniformName], 1, false, (GLfloat*)mat3);
+}
+
 std::string Program::GetShaderFromFile(const char* fileName)
 {
     std::ifstream file(fileName);
