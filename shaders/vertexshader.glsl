@@ -6,5 +6,5 @@ uniform mat3 uMtxTransform;
 
 void main()
 {                                  
-    gl_Position = vec4(inPosition * uMtxTransform, 1.0f);
+    gl_Position = vec4(uMtxTransform * inPosition, 1.0f);
 }

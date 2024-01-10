@@ -14,6 +14,10 @@
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
 
+float rotationAngle;
+glm::vec2 position;
+float scale;
+
 std::vector<glm::vec3> vertices;
 std::vector<unsigned int> indices;
 
@@ -22,14 +26,13 @@ void createCircle(float radius, int vertexCount)
     float angle = 360.0f / vertexCount;
     int triangleCount = vertexCount - 2;
 
-    std::vector<glm::vec3> tempVertices;
     for (int i = 0; i < vertexCount; i++)
     {
         float newAngle = angle * i;
 
         float x = radius * cos(glm::radians(newAngle));
         float y = radius * sin(glm::radians(newAngle));
-        float z = 0.0f;
+        float z = 1.0f;
 
         vertices.push_back(glm::vec3(x, y, z));
     }
@@ -52,18 +55,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     if (key == GLFW_KEY_ESCAPE) 
         glfwTerminate();
 
-    Square* firstPart = new Square(0.0f, 0.0f, 1.0f);
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-        firstPart -> setDirection(Square::LEFT);
+        position.x -= 0.01f;
 
     if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        firstPart -> setDirection(Square::RIGHT);
+        position.x += 0.01f;
 
     if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-        firstPart -> setDirection(Square::UP);
+        position.y += 0.01f;
     
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-        firstPart -> setDirection(Square::DOWN);
+        position.y -= 0.01f;
+
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+        scale -= 0.1f;
+
+    if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+        scale += 0.1f;
 }
 
 int main(int argc, char** argv)
@@ -99,7 +107,7 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    createCircle(1, 12);
+    createCircle(0.2f, 12);
     
     // ------ CREATE SHADER PROGRAM ------
     Program program;
@@ -136,15 +144,21 @@ int main(int argc, char** argv)
     glEnableVertexAttribArray(0);
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
 
-    float rotationAngle = 0.0f;
+    rotationAngle = 0.0f;
+    position = glm::vec2(0.0f, 0.0f);
+    scale = 1.0f;
     glm::mat3 mtxTransform(1);
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mtxTransform = glm::rotate(mtxTransform, glm::radians(rotationAngle));
-        rotationAngle += 0.1f;
+        glm::mat3 mtxTranslation = glm::translate(glm::mat3(1), position);
+        glm::mat3 mtxRotation = glm::rotate(glm::mat3(1), glm::radians(rotationAngle));
+        glm::mat3 mtxScale = glm::scale(glm::mat3(1), glm::vec2(scale, scale));
+        mtxTransform = mtxTranslation * mtxRotation * mtxScale; // T x R x S x vertex
+
+        rotationAngle += 1.0f;
 
         program.use();
         glBindVertexArray(VAO);
