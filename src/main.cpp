@@ -11,14 +11,23 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb/stb_image.h>
+
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
+
+struct Vertex
+{
+    glm::vec3 position;
+    glm::vec2 texture;
+};
 
 float rotationAngle;
 glm::vec2 position;
 float scale;
 
-std::vector<glm::vec3> vertices;
+std::vector<Vertex> vertices;
 std::vector<unsigned int> indices;
 
 void createCircle(float radius, int vertexCount)
@@ -34,7 +43,7 @@ void createCircle(float radius, int vertexCount)
         float y = radius * sin(glm::radians(newAngle));
         float z = 1.0f;
 
-        vertices.push_back(glm::vec3(x, y, z));
+        // vertices.push_back(glm::vec3(x, y, z));
     }
 
     for (int i = 0; i < triangleCount; i++)
@@ -43,6 +52,33 @@ void createCircle(float radius, int vertexCount)
         indices.push_back(i + 1);
         indices.push_back(i + 2);
     }
+}
+
+void createSquare(float length)
+{
+    Vertex v0, v1, v2, v3;
+    v0.position = glm::vec3(-length/2, length/2, 0.0f);
+    v1.position = glm::vec3(-length/2, -length/2, 0.0f);
+    v2.position = glm::vec3(length/2, -length/2, 0.0f);
+    v3.position = glm::vec3(length/2, length/2, 0.0f);
+
+    v0.texture = glm::vec2(0.0f, 1.0f);
+    v1.texture = glm::vec2(0.0f, 0.0f);
+    v2.texture = glm::vec2(1.0f, 0.0f);
+    v3.texture = glm::vec2(1.0f, 1.0f);
+
+    vertices.push_back(v0);
+    vertices.push_back(v1);
+    vertices.push_back(v2);
+    vertices.push_back(v3);
+
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(3);
+    
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(3);
 }
 
 void errorCallback(int error, const char* description) 
@@ -107,7 +143,8 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    createCircle(0.2f, 12);
+    //createCircle(0.2f, 12);
+    createSquare(1.0f);
     
     // ------ CREATE SHADER PROGRAM ------
     Program program;
@@ -123,7 +160,7 @@ int main(int argc, char** argv)
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
     // ------ CREATE VERTEX BUFFER OBJECT END ------
 
     // ------ CREATE VERTEX ARRAY OBJECT ------
@@ -140,9 +177,28 @@ int main(int argc, char** argv)
     // ------ CREATE INDEX BUFFER OBJECT END ------
 
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
+
+    // ------ LOAD TEXTURE ------
+    int width, height, nrChannels;
+    unsigned char* imageData = stbi_load("../images/texture_1.png", &width, &height, &nrChannels, 0);
+
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    stbi_image_free(imageData);
+    // ------ LOAD TEXTURE END ------
 
     rotationAngle = 0.0f;
     position = glm::vec2(0.0f, 0.0f);
@@ -161,11 +217,15 @@ int main(int argc, char** argv)
         rotationAngle += 1.0f;
 
         program.use();
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+
         glBindVertexArray(VAO);
-        glEnableVertexAttribArray(0);
 
         program.setVec4ValueToUniform("uColor", glm::vec4(0.4f, 0.8f, 0.5f, 1.0f));
         program.setMat3ValueToUniform("uMtxTransform", &mtxTransform);
+        
         // glDrawArray is using vertex buffer directly
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
