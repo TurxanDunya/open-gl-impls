@@ -20,6 +20,7 @@ public:
     void setVec3ValueToUniform(const std::string& uniformName, glm::vec3 vec3);
     void setVec4ValueToUniform(const std::string& uniformName, glm::vec4 vec4);
     void setMat3ValueToUniform(const std::string& uniformName, glm::mat3* mat3);
+    void setMat4ValueToUniform(const std::string& uniformName, glm::mat4* mat4);
 
 private:
     unsigned int m_ProgramId;

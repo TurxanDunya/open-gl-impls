@@ -9,7 +9,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
-#include <glm/gtx/matrix_transform_2d.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
@@ -22,7 +22,7 @@ struct Vertex
 };
 
 float rotationAngle;
-glm::vec2 position;
+glm::vec3 position;
 float scale;
 
 std::vector<Vertex> vertices;
@@ -146,8 +146,8 @@ int main(int argc, char** argv)
     
     // ------ CREATE SHADER PROGRAM ------
     Program program;
-    program.attachShader("../shaders/vertexshader.glsl", GL_VERTEX_SHADER);
-    program.attachShader("../shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
+    program.attachShader("../src-3d/shaders/vertexshader.glsl", GL_VERTEX_SHADER);
+    program.attachShader("../src-3d/shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
     program.link();
     // ------ CREATE SHADER PROGRAM END ------
 
@@ -187,18 +187,25 @@ int main(int argc, char** argv)
     // ------ LOAD TEXTURE END ------
 
     rotationAngle = 0.0f;
-    position = glm::vec2(0.0f, 0.0f);
+    position = glm::vec3(0.0f, 0.0f, 0.0f);
     scale = 1.0f;
-    glm::mat3 mtxTransform(1);
+
+    glm::mat4 mtxTransform(1);
+    glm::mat4 mtxProjection = glm::perspective(
+        glm::radians(90.0f), (800.0f / 800.0f), 1.0f, 100.0f);
+
+    glm::vec3 cameraPosition(0.0f, 0.0f, 5.0f);
+    glm::vec3 cameraLookAt(0.0f, 0.0f, 0.0f);
+    glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
+    glm::mat4 mtxCamera = glm::lookAt(cameraPosition, cameraLookAt, cameraUp);
+
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glm::mat3 mtxTranslation = glm::translate(glm::mat3(1), position);
-        glm::mat3 mtxRotation = glm::rotate(glm::mat3(1), glm::radians(rotationAngle));
-        glm::mat3 mtxScale = glm::scale(glm::mat3(1), glm::vec2(scale, scale));
-        mtxTransform = mtxTranslation * mtxRotation * mtxScale; // T x R x S x vertex
+        glm::mat4 mtxTranslation = glm::translate(glm::mat4(1), position);
+        mtxTransform = mtxProjection * mtxCamera * mtxTranslation;
 
         rotationAngle += 1.0f;
 
@@ -209,7 +216,7 @@ int main(int argc, char** argv)
         glBindVertexArray(VAO);
 
         program.setVec4ValueToUniform("uColor", glm::vec4(0.4f, 0.8f, 0.5f, 1.0f));
-        program.setMat3ValueToUniform("uMtxTransform", &mtxTransform);
+        program.setMat4ValueToUniform("uMtxTransform", &mtxTransform);
         
         // glDrawArray is using vertex buffer directly
         glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);

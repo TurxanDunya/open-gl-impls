@@ -146,8 +146,8 @@ int main(int argc, char** argv)
     
     // ------ CREATE SHADER PROGRAM ------
     Program program;
-    program.attachShader("../shaders/vertexshader.glsl", GL_VERTEX_SHADER);
-    program.attachShader("../shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
+    program.attachShader("../src-2d/shaders/vertexshader.glsl", GL_VERTEX_SHADER);
+    program.attachShader("../src-2d/shaders/fragmentshader.glsl", GL_FRAGMENT_SHADER);
     program.link();
     // ------ CREATE SHADER PROGRAM END ------
 
