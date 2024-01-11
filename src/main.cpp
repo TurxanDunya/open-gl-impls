@@ -11,11 +11,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/matrix_transform_2d.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb/stb_image.h>
-
 #include "shaderprogram/program.hpp"
 #include "shapes/square.hpp"
+#include "texture/texturemanager.hpp"
 
 struct Vertex
 {
@@ -185,19 +183,7 @@ int main(int argc, char** argv)
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
 
     // ------ LOAD TEXTURE ------
-    int width, height, nrChannels;
-    unsigned char* imageData = stbi_load("../images/texture_1.png", &width, &height, &nrChannels, 0);
-
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
-
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_image_free(imageData);
+    unsigned int textureId = TextureManager::getInstance() -> loadTexture("texture_1.png");
     // ------ LOAD TEXTURE END ------
 
     rotationAngle = 0.0f;
@@ -218,8 +204,7 @@ int main(int argc, char** argv)
 
         program.use();
 
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        TextureManager::getInstance() -> activateTexture(GL_TEXTURE0, textureId);
 
         glBindVertexArray(VAO);
 

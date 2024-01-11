@@ -9,10 +9,12 @@ set(PROJECT_SOURCES
             ${PROjECT_SOURCE_DIR}/main.cpp
             ${PROjECT_SOURCE_DIR}/vendor/glad.c
             ${PROjECT_SOURCE_DIR}/shaderprogram/program.cpp
-            ${PROjECT_SOURCE_DIR}/shapes/square.cpp)
+            ${PROjECT_SOURCE_DIR}/shapes/square.cpp
+            ${PROjECT_SOURCE_DIR}/texture/texturemanager.cpp)
 set(PROJECT_HEADERS
             ${PROjECT_SOURCE_DIR}/shaderprogram/program.hpp
-            ${PROjECT_SOURCE_DIR}/shapes/square.hpp)
+            ${PROjECT_SOURCE_DIR}/shapes/square.hpp
+            ${PROjECT_SOURCE_DIR}/texture/texturemanager.hpp)
 
 find_package(glfw3 3.2 REQUIRED)
 find_package(glm REQUIRED)
