@@ -4,7 +4,7 @@ project(OPEN-GL-IMPLS)
 
 set(PROJECT_DIR ${CMAKE_SOURCE_DIR})
 set(PROjECT_INCLUDE_DIR ${PROJECT_DIR}/include)
-set(PROjECT_SOURCE_DIR ${PROJECT_DIR}/src)
+set(PROjECT_SOURCE_DIR ${PROJECT_DIR}/src-3d)
 set(PROJECT_SOURCES 
             ${PROjECT_SOURCE_DIR}/main.cpp
             ${PROjECT_SOURCE_DIR}/vendor/glad.c
