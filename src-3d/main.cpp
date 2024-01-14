@@ -18,7 +18,7 @@
 struct Vertex
 {
     glm::vec3 position;
-    glm::vec2 texture;
+    glm::vec4 color;
 };
 
 float rotationAngle;
@@ -28,55 +28,89 @@ float scale;
 std::vector<Vertex> vertices;
 std::vector<unsigned int> indices;
 
-void createCircle(float radius, int vertexCount)
-{
-    float angle = 360.0f / vertexCount;
-    int triangleCount = vertexCount - 2;
-
-    for (int i = 0; i < vertexCount; i++)
-    {
-        float newAngle = angle * i;
-
-        float x = radius * cos(glm::radians(newAngle));
-        float y = radius * sin(glm::radians(newAngle));
-        float z = 1.0f;
-
-        // vertices.push_back(glm::vec3(x, y, z));
-    }
-
-    for (int i = 0; i < triangleCount; i++)
-    {
-        indices.push_back(0);
-        indices.push_back(i + 1);
-        indices.push_back(i + 2);
-    }
-}
-
 void createSquare(float length)
 {
-    Vertex v0, v1, v2, v3;
-    v0.position = glm::vec3(-length/2, length/2, 0.0f);
-    v1.position = glm::vec3(-length/2, -length/2, 0.0f);
-    v2.position = glm::vec3(length/2, -length/2, 0.0f);
-    v3.position = glm::vec3(length/2, length/2, 0.0f);
+    Vertex v0, v1, v2, v3, v4, v5, v6, v7;
+    v0.position = glm::vec3(-length/2, -length/2, -length/2);
+    v1.position = glm::vec3( length/2, -length/2, -length/2);
+    v2.position = glm::vec3( length/2, -length/2,  length/2);
+    v3.position = glm::vec3(-length/2, -length/2,  length/2);
+    v4.position = glm::vec3(-length/2,  length/2, -length/2);
+    v5.position = glm::vec3( length/2,  length/2, -length/2);
+    v6.position = glm::vec3( length/2,  length/2,  length/2);
+    v7.position = glm::vec3(-length/2,  length/2,  length/2);
 
-    v0.texture = glm::vec2(0.0f, 1.0f);
-    v1.texture = glm::vec2(0.0f, 0.0f);
-    v2.texture = glm::vec2(1.0f, 0.0f);
-    v3.texture = glm::vec2(1.0f, 1.0f);
+    v0.color = glm::vec4(1.0f,0.0f,0.0f,1.0f);
+    v1.color = glm::vec4(1.0f,1.0f,0.0f,1.0f);
+    v2.color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+    v3.color = glm::vec4(0.0f,1.0f,0.0f,1.0f);
+    v4.color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
+    v5.color = glm::vec4(0.0f,1.0f,1.0f,1.0f);
+    v6.color = glm::vec4(0.0f,0.0f,1.0f,1.0f);
+    v7.color = glm::vec4(1.0f,1.0f,0.0f,1.0f);
 
     vertices.push_back(v0);
     vertices.push_back(v1);
     vertices.push_back(v2);
     vertices.push_back(v3);
+    vertices.push_back(v4);
+    vertices.push_back(v5);
+    vertices.push_back(v6);
+    vertices.push_back(v7);
 
+    // front face
+    indices.push_back(7);
+    indices.push_back(3);
+    indices.push_back(2);
+    
+    indices.push_back(7);
+    indices.push_back(2);
+    indices.push_back(6);
+
+    // right face
+    indices.push_back(6);
+    indices.push_back(2);
+    indices.push_back(1);
+    
+    indices.push_back(6);
+    indices.push_back(1);
+    indices.push_back(5);
+
+    // face 3
+    indices.push_back(4);
+    indices.push_back(7);
+    indices.push_back(6);
+    
+    indices.push_back(4);
+    indices.push_back(6);
+    indices.push_back(5);
+
+    // bottom face
+    indices.push_back(0);
+    indices.push_back(3);
+    indices.push_back(2);
+    
+    indices.push_back(0);
+    indices.push_back(2);
+    indices.push_back(1);
+
+    // face 5
+    indices.push_back(4);
     indices.push_back(0);
     indices.push_back(1);
-    indices.push_back(3);
     
+    indices.push_back(4);
     indices.push_back(1);
-    indices.push_back(2);
+    indices.push_back(5);
+
+    // face 6
+    indices.push_back(7);
     indices.push_back(3);
+    indices.push_back(0);
+    
+    indices.push_back(7);
+    indices.push_back(0);
+    indices.push_back(4);
 }
 
 void errorCallback(int error, const char* description) 
@@ -175,10 +209,10 @@ int main(int argc, char** argv)
     // ------ CREATE INDEX BUFFER OBJECT END ------
 
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
 
@@ -194,7 +228,7 @@ int main(int argc, char** argv)
     glm::mat4 mtxProjection = glm::perspective(
         glm::radians(90.0f), (800.0f / 800.0f), 1.0f, 100.0f);
 
-    glm::vec3 cameraPosition(0.0f, 0.0f, 5.0f);
+    glm::vec3 cameraPosition(0.0f, 2.0f, 5.0f);
     glm::vec3 cameraLookAt(0.0f, 0.0f, 0.0f);
     glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
     glm::mat4 mtxCamera = glm::lookAt(cameraPosition, cameraLookAt, cameraUp);
@@ -204,8 +238,8 @@ int main(int argc, char** argv)
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glm::mat4 mtxTranslation = glm::translate(glm::mat4(1), position);
-        mtxTransform = mtxProjection * mtxCamera * mtxTranslation;
+        glm::mat4 mtxRotation = glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+        mtxTransform = mtxProjection * mtxCamera * mtxRotation;
 
         rotationAngle += 1.0f;
 
