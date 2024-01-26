@@ -18,7 +18,7 @@
 struct Vertex
 {
     glm::vec3 position;
-    glm::vec4 color;
+    glm::vec2 texCoord;
 };
 
 float rotationAngle;
@@ -30,87 +30,95 @@ std::vector<unsigned int> indices;
 
 void createSquare(float length)
 {
-    Vertex v0, v1, v2, v3, v4, v5, v6, v7;
-    v0.position = glm::vec3(-length/2, -length/2, -length/2);
-    v1.position = glm::vec3( length/2, -length/2, -length/2);
-    v2.position = glm::vec3( length/2, -length/2,  length/2);
-    v3.position = glm::vec3(-length/2, -length/2,  length/2);
-    v4.position = glm::vec3(-length/2,  length/2, -length/2);
-    v5.position = glm::vec3( length/2,  length/2, -length/2);
-    v6.position = glm::vec3( length/2,  length/2,  length/2);
-    v7.position = glm::vec3(-length/2,  length/2,  length/2);
+    glm::vec3 v[8];
+    v[0] = glm::vec3(-length / 2, -length / 2, -length / 2);
+    v[1] = glm::vec3( length / 2, -length / 2, -length / 2);
+    v[2] = glm::vec3( length / 2, -length / 2,  length / 2);
+    v[3] = glm::vec3(-length / 2, -length / 2,  length / 2);
+    v[4] = glm::vec3(-length / 2,  length / 2, -length / 2);
+    v[5] = glm::vec3( length / 2,  length / 2, -length / 2);
+    v[6] = glm::vec3( length / 2,  length / 2,  length / 2);
+    v[7] = glm::vec3(-length / 2,  length / 2,  length / 2);
 
-    v0.color = glm::vec4(1.0f,0.0f,0.0f,1.0f);
-    v1.color = glm::vec4(1.0f,1.0f,0.0f,1.0f);
-    v2.color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-    v3.color = glm::vec4(0.0f,1.0f,0.0f,1.0f);
-    v4.color = glm::vec4(1.0f,0.0f,1.0f,1.0f);
-    v5.color = glm::vec4(0.0f,1.0f,1.0f,1.0f);
-    v6.color = glm::vec4(0.0f,0.0f,1.0f,1.0f);
-    v7.color = glm::vec4(1.0f,1.0f,0.0f,1.0f);
+    Vertex tempVertices[24];
 
-    vertices.push_back(v0);
-    vertices.push_back(v1);
-    vertices.push_back(v2);
-    vertices.push_back(v3);
-    vertices.push_back(v4);
-    vertices.push_back(v5);
-    vertices.push_back(v6);
-    vertices.push_back(v7);
+    // face 1
+    tempVertices[0].position = v[7];
+    tempVertices[1].position = v[3];
+    tempVertices[2].position = v[2];
+    tempVertices[3].position = v[6];
+    tempVertices[0].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[1].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[2].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[3].texCoord = glm::vec2(1.0f, 1.0f);
 
-    // front face
-    indices.push_back(7);
-    indices.push_back(3);
-    indices.push_back(2);
-    
-    indices.push_back(7);
-    indices.push_back(2);
-    indices.push_back(6);
-
-    // right face
-    indices.push_back(6);
-    indices.push_back(2);
-    indices.push_back(1);
-    
-    indices.push_back(6);
-    indices.push_back(1);
-    indices.push_back(5);
+    // face 2
+    tempVertices[4].position = v[6];
+    tempVertices[5].position = v[2];
+    tempVertices[6].position = v[1];
+    tempVertices[7].position = v[5];
+    tempVertices[4].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[5].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[6].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[7].texCoord = glm::vec2(1.0f, 1.0f);
 
     // face 3
-    indices.push_back(4);
-    indices.push_back(7);
-    indices.push_back(6);
-    
-    indices.push_back(4);
-    indices.push_back(6);
-    indices.push_back(5);
+    tempVertices[8 ].position = v[4];
+    tempVertices[9 ].position = v[7];
+    tempVertices[10].position = v[6];
+    tempVertices[11].position = v[5];
+    tempVertices[8 ].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[9 ].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[10].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[11].texCoord = glm::vec2(1.0f, 1.0f);
 
-    // bottom face
-    indices.push_back(0);
-    indices.push_back(3);
-    indices.push_back(2);
-    
-    indices.push_back(0);
-    indices.push_back(2);
-    indices.push_back(1);
+    // face 4
+    tempVertices[12].position = v[0];
+    tempVertices[13].position = v[3];
+    tempVertices[14].position = v[2];
+    tempVertices[15].position = v[1];
+    tempVertices[12].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[13].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[14].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[15].texCoord = glm::vec2(1.0f, 1.0f);
 
     // face 5
-    indices.push_back(4);
-    indices.push_back(0);
-    indices.push_back(1);
-    
-    indices.push_back(4);
-    indices.push_back(1);
-    indices.push_back(5);
+    tempVertices[16].position = v[4];
+    tempVertices[17].position = v[0];
+    tempVertices[18].position = v[1];
+    tempVertices[19].position = v[5];
+    tempVertices[16].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[17].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[18].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[19].texCoord = glm::vec2(1.0f, 1.0f);
 
     // face 6
-    indices.push_back(7);
-    indices.push_back(3);
-    indices.push_back(0);
-    
-    indices.push_back(7);
-    indices.push_back(0);
-    indices.push_back(4);
+    tempVertices[20].position = v[7];
+    tempVertices[21].position = v[3];
+    tempVertices[22].position = v[0];
+    tempVertices[23].position = v[4];
+    tempVertices[20].texCoord = glm::vec2(0.0f, 1.0f);
+    tempVertices[21].texCoord = glm::vec2(0.0f, 0.0f);
+    tempVertices[22].texCoord = glm::vec2(1.0f, 0.0f);
+    tempVertices[23].texCoord = glm::vec2(1.0f, 1.0f);
+
+    for (int i = 0; i < 24; i++)
+    {
+        vertices.push_back(tempVertices[i]);
+    }
+
+    for (int i = 0; i < 6; i++)
+    {
+        int startIndex = 4 * i;
+
+        indices.push_back(startIndex);
+        indices.push_back(startIndex + 1);
+        indices.push_back(startIndex + 2);
+
+        indices.push_back(startIndex);
+        indices.push_back(startIndex + 2);
+        indices.push_back(startIndex + 3);
+    }
 }
 
 void errorCallback(int error, const char* description) 
@@ -175,7 +183,6 @@ int main(int argc, char** argv)
         return -1;
     }
 
-    //createCircle(0.2f, 12);
     createSquare(1.0f);
     
     // ------ CREATE SHADER PROGRAM ------
@@ -185,7 +192,6 @@ int main(int argc, char** argv)
     program.link();
     // ------ CREATE SHADER PROGRAM END ------
 
-    program.addUniform("uColor");
     program.addUniform("uMtxTransform");
 
     // ------ CREATE VERTEX BUFFER OBJECT ------
@@ -209,15 +215,15 @@ int main(int argc, char** argv)
     // ------ CREATE INDEX BUFFER OBJECT END ------
 
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)0);
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 5, (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
     // ------ CREATE VERTEX ATTRIB POINTER OBJECT END ------
 
     // ------ LOAD TEXTURE ------
-    unsigned int textureId = TextureManager::getInstance() -> loadTexture("texture_1.png");
+    unsigned int textureId = TextureManager::getInstance() -> loadTexture("texture_2.jpg");
     // ------ LOAD TEXTURE END ------
 
     rotationAngle = 0.0f;
@@ -228,15 +234,16 @@ int main(int argc, char** argv)
     glm::mat4 mtxProjection = glm::perspective(
         glm::radians(90.0f), (800.0f / 800.0f), 1.0f, 100.0f);
 
-    glm::vec3 cameraPosition(0.0f, 2.0f, 5.0f);
+    glm::vec3 cameraPosition(2.0f, 2.0f, 2.0f);
     glm::vec3 cameraLookAt(0.0f, 0.0f, 0.0f);
     glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
     glm::mat4 mtxCamera = glm::lookAt(cameraPosition, cameraLookAt, cameraUp);
 
+    glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 mtxRotation = glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
         mtxTransform = mtxProjection * mtxCamera * mtxRotation;
@@ -249,7 +256,6 @@ int main(int argc, char** argv)
 
         glBindVertexArray(VAO);
 
-        program.setVec4ValueToUniform("uColor", glm::vec4(0.4f, 0.8f, 0.5f, 1.0f));
         program.setMat4ValueToUniform("uMtxTransform", &mtxTransform);
         
         // glDrawArray is using vertex buffer directly
