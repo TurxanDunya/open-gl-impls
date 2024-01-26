@@ -132,16 +132,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwTerminate();
 
     if (key == GLFW_KEY_LEFT && action == GLFW_PRESS)
-        position.x -= 0.01f;
+        position.x -= 0.1f;
 
     if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS)
-        position.x += 0.01f;
+        position.x += 0.1f;
 
     if (key == GLFW_KEY_UP && action == GLFW_PRESS)
-        position.y += 0.01f;
+        position.y += 0.1f;
     
     if (key == GLFW_KEY_DOWN && action == GLFW_PRESS)
-        position.y -= 0.01f;
+        position.y -= 0.1f;
 
     if (key == GLFW_KEY_1 && action == GLFW_PRESS)
         scale -= 0.1f;
@@ -238,15 +238,16 @@ int main(int argc, char** argv)
     glm::vec3 cameraLookAt(0.0f, 0.0f, 0.0f);
     glm::vec3 cameraUp(0.0f, 1.0f, 0.0f);
     glm::mat4 mtxCamera = glm::lookAt(cameraPosition, cameraLookAt, cameraUp);
-
+ 
     glEnable(GL_DEPTH_TEST);
     while (!glfwWindowShouldClose(window))
     {
         glClearColor(0.0f, 0.4f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 mtxRotation = glm::rotate(glm::mat4(1), glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-        mtxTransform = mtxProjection * mtxCamera * mtxRotation;
+        glm::mat4 mtxTranslation = glm::translate(glm::mat4(1), position);
+        glm::mat4 mtxRotation = glm::rotate(glm::mat4(1),glm::radians(rotationAngle),glm::vec3(1.0,0.0f,1.0f));
+        mtxTransform = mtxProjection * mtxCamera * mtxTranslation * mtxRotation;
 
         rotationAngle += 1.0f;
 
